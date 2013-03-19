@@ -5,5 +5,5 @@ pkg/*
 tmp
 vendor
 
-bin
-!bin/librarian-chef
+/bin/*
+!/bin/librarian-chef
