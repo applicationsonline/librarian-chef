@@ -44,13 +44,13 @@ module Librarian
 
     private
 
-      if IO.respond_to?(:binread)
+      if File.respond_to?(:binread)
         def binread(path)
-          path.binread
+          File.binread(path)
         end
       else
         def binread(path)
-          path.read
+          File.read(path)
         end
       end
 
