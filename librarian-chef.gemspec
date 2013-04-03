@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_dependency "librarian", ">= 0.1.0.beta.1"
+  gem.add_dependency "librarian", "~> 0.1.0"
   gem.add_dependency "chef", ">= 0.10"
   gem.add_dependency "archive-tar-minitar", ">= 0.5.2"
 
