@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = Librarian::Chef::VERSION
   gem.authors       = ["Jay Feldblum"]
   gem.email         = ["y_feldblum@yahoo.com"]
-  gem.description   = %q{Librarian::Chef}
-  gem.summary       = %q{Librarian::Chef}
+  gem.summary       = %q{A Bundler for your Chef Cookbooks.}
+  gem.description   = %q{A Bundler for your Chef Cookbooks.}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
