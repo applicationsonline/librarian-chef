@@ -140,7 +140,7 @@ Prepare your infrastructure repository:
 Librarian-Chef takes over your `cookbooks/` directory, and will always reinstall
 the cookbooks listed the `Cheffile.lock` into your `cookbooks/` directory. Hence
 you do not need your `cookbooks/` directory to be tracked in Git. If you
-nevertheless want your `cookbooks/` directory to be tracked in Git, simple don't
+nevertheless want your `cookbooks/` directory to be tracked in Git, simply don't
 `.gitignore` the directory.
 
 If you are manually tracking/vendoring outside cookbooks within the repository,
