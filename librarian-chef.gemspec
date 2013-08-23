@@ -11,6 +11,7 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{A Bundler for your Chef Cookbooks.}
   gem.description   = %q{A Bundler for your Chef Cookbooks.}
   gem.homepage      = ""
+  gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
