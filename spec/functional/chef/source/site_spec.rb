@@ -21,60 +21,13 @@ module Librarian
         end
         let(:tmp_path) { project_path.join("tmp/spec/functional/chef/source/site") }
         after { tmp_path.rmtree if tmp_path && tmp_path.exist? }
-        let(:sample_path) { tmp_path.join("sample") }
-        let(:sample_metadata) do
-          Helpers.strip_heredoc(<<-METADATA)
-            version "0.6.5"
-          METADATA
-        end
 
         let(:api_url) { "http://site.cookbooks.com" }
 
-        let(:sample_index_data) do
-          {
-            "name" => "sample",
-            "versions" => [
-              "#{api_url}/cookbooks/sample/versions/0_6_5"
-            ]
-          }
-        end
-        let(:sample_0_6_5_data) do
-          {
-            "version" => "0.6.5",
-            "file" => "#{api_url}/cookbooks/sample/versions/0_6_5/file.tar.gz"
-          }
-        end
-        let(:sample_0_6_5_package) do
-          s = StringIO.new
-          z = Zlib::GzipWriter.new(s, Zlib::NO_COMPRESSION)
-          t = Archive::Tar::Minitar::Output.new(z)
-          t.tar.add_file_simple("sample/metadata.rb", :mode => 0700,
-            :size => sample_metadata.bytesize){|io| io.write(sample_metadata)}
-          t.close
-          z.close unless z.closed?
-          s.string
-        end
+        let(:repo_path) { tmp_path.join("repo") }
+        let(:env) { repo_path.mkpath ; Environment.new(:project_path => repo_path) }
 
-        # depends on repo_path being defined in each context
-        let(:env) { Environment.new(:project_path => repo_path) }
-
-        before do
-          stub_request(:get, "#{api_url}/cookbooks/sample").
-            to_return(:body => JSON.dump(sample_index_data))
-
-          stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5").
-            to_return(:body => JSON.dump(sample_0_6_5_data))
-
-          stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5/file.tar.gz").
-            to_return(:body => sample_0_6_5_package)
-        end
-
-        after do
-          WebMock.reset!
-        end
-
-        let(:repo_path) { tmp_path.join("methods") }
-        before { repo_path.mkpath }
+        after { WebMock.reset! }
 
         describe "lint" do
           it "lints" do
@@ -119,6 +72,49 @@ module Librarian
         end
 
         describe "instance methods" do
+
+          let(:sample_metadata) do
+            Helpers.strip_heredoc(<<-METADATA)
+              version "0.6.5"
+            METADATA
+          end
+
+          let(:sample_index_data) do
+            {
+              "name" => "sample",
+              "versions" => [
+                "#{api_url}/cookbooks/sample/versions/0_6_5"
+              ]
+            }
+          end
+          let(:sample_0_6_5_data) do
+            {
+              "version" => "0.6.5",
+              "file" => "#{api_url}/cookbooks/sample/versions/0_6_5/file.tar.gz"
+            }
+          end
+          let(:sample_0_6_5_package) do
+            s = StringIO.new
+            z = Zlib::GzipWriter.new(s, Zlib::NO_COMPRESSION)
+            t = Archive::Tar::Minitar::Output.new(z)
+            t.tar.add_file_simple("sample/metadata.rb", :mode => 0700,
+              :size => sample_metadata.bytesize){|io| io.write(sample_metadata)}
+            t.close
+            z.close unless z.closed?
+            s.string
+          end
+
+          before do
+            stub_request(:get, "#{api_url}/cookbooks/sample").
+              to_return(:body => JSON.dump(sample_index_data))
+
+            stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5").
+              to_return(:body => JSON.dump(sample_0_6_5_data))
+
+            stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5/file.tar.gz").
+              to_return(:body => sample_0_6_5_package)
+          end
+
           let(:source) { described_class.new(env, api_url) }
 
           describe "#manifests" do
@@ -203,6 +199,37 @@ module Librarian
         describe "following http redirects" do
           let(:source) { described_class.new(env, api_url) }
 
+          let(:sample_metadata) do
+            Helpers.strip_heredoc(<<-METADATA)
+              version "0.6.5"
+            METADATA
+          end
+
+          let(:sample_index_data) do
+            {
+              "name" => "sample",
+              "versions" => [
+                "#{api_url}/cookbooks/sample/versions/0_6_5"
+              ]
+            }
+          end
+          let(:sample_0_6_5_data) do
+            {
+              "version" => "0.6.5",
+              "file" => "#{api_url}/cookbooks/sample/versions/0_6_5/file.tar.gz"
+            }
+          end
+          let(:sample_0_6_5_package) do
+            s = StringIO.new
+            z = Zlib::GzipWriter.new(s, Zlib::NO_COMPRESSION)
+            t = Archive::Tar::Minitar::Output.new(z)
+            t.tar.add_file_simple("sample/metadata.rb", :mode => 0700,
+              :size => sample_metadata.bytesize){|io| io.write(sample_metadata)}
+            t.close
+            z.close unless z.closed?
+            s.string
+          end
+
           def redirect_to(url)
             {:status => 302, :headers => {"Location" => url}}
           end
@@ -215,6 +242,12 @@ module Librarian
                 to_return redirect_to "#{api_url}/cookbooks/sample-2"
               stub_request(:get, "#{api_url}/cookbooks/sample-2").
                 to_return(:body => JSON.dump(sample_index_data))
+
+              stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5").
+                to_return(:body => JSON.dump(sample_0_6_5_data))
+
+              stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5/file.tar.gz").
+                to_return(:body => sample_0_6_5_package)
             end
 
             it "follows a sequence of redirects" do
