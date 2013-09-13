@@ -9,16 +9,14 @@ require 'librarian/action/install'
 require 'librarian/action/update'
 require 'librarian/chef'
 
+require 'support/project_path'
+
 module Librarian
   module Chef
     module Source
       describe Git do
 
-        let(:project_path) do
-          project_path = Pathname.new(__FILE__).expand_path
-          project_path = project_path.dirname until project_path.join("Rakefile").exist?
-          project_path
-        end
+        let(:project_path) { ::Support::ProjectPath.project_path }
         let(:tmp_path) { project_path.join("tmp/spec/integration/chef/source/git") }
         after { tmp_path.rmtree if tmp_path && tmp_path.exist? }
 
