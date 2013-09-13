@@ -250,6 +250,15 @@ module Librarian
             path.open("wb"){|f| f.write(bytes)}
           end
 
+          def untar!(source, destination)
+            source = Pathname(source)
+            destination = Pathname(destination)
+
+            Zlib::GzipReader.open(source) do |input|
+              Archive::Tar::Minitar.unpack(input, destination.to_s)
+            end
+          end
+
           def unpack_package!(path, source)
             path = Pathname(path)
             source = Pathname(source)
@@ -258,9 +267,7 @@ module Librarian
             temp.mkpath
 
             debug { "Unpacking #{relative_path_to(source)} to #{relative_path_to(temp)}" }
-            Zlib::GzipReader.open(source) do |input|
-              Archive::Tar::Minitar.unpack(input, temp.to_s)
-            end
+            untar! source, temp
 
             # Cookbook files, as pulled from Opscode Community Site API, are
             # embedded in a subdirectory of the tarball. If created by git archive they
