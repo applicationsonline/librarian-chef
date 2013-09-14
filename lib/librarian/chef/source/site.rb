@@ -250,7 +250,7 @@ module Librarian
             path.open("wb"){|f| f.write(bytes)}
           end
 
-          def untar!(source, destination)
+          def extract_archive!(source, destination)
             source = Pathname(source)
             destination = Pathname(destination)
 
@@ -267,7 +267,7 @@ module Librarian
             temp.mkpath
 
             debug { "Unpacking #{relative_path_to(source)} to #{relative_path_to(temp)}" }
-            untar! source, temp
+            extract_archive! source, temp
 
             # Cookbook files, as pulled from Opscode Community Site API, are
             # embedded in a subdirectory of the tarball. If created by git archive they
