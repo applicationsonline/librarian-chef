@@ -250,11 +250,46 @@ module Librarian
             path.open("wb"){|f| f.write(bytes)}
           end
 
+          def path_detect_gzip?(path)
+            path = Pathname(path)
+            r = Zlib::GzipReader.new(path)
+            true
+          rescue Zlib::GzipFile::Error
+            false
+          ensure
+            r.close if r && !r.closed?
+          end
+
+          def path_detect_tar?(path)
+            path_read_bytes_at(path, 257, 8) == "ustar\x0000"
+          end
+
+          def path_read_bytes_at(path, pos, len)
+            path = Pathname(path)
+            path.open "rb" do |f|
+              f.size >= pos + len or return
+              f.seek pos ; f.pos == pos or return
+              f.read(len)
+            end
+          end
+
           def extract_archive!(source, destination)
             source = Pathname(source)
             destination = Pathname(destination)
 
+            return extract_archive_targz! source, destination if path_detect_gzip?(source)
+            return extract_archive_tar! source, destination if path_detect_tar?(source)
+            raise "Unrecognized archive format!"
+          end
+
+          def extract_archive_targz!(source, destination)
             Zlib::GzipReader.open(source) do |input|
+              Archive::Tar::Minitar.unpack(input, destination.to_s)
+            end
+          end
+
+          def extract_archive_tar!(source, destination)
+            source.open "rb" do |input|
               Archive::Tar::Minitar.unpack(input, destination.to_s)
             end
           end

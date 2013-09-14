@@ -291,6 +291,59 @@ module Librarian
           end
         end
 
+        describe "extracting .tar packages" do
+          let(:source) { described_class.new(env, api_url) }
+
+          let(:sample_metadata) do
+            Helpers.strip_heredoc(<<-METADATA)
+              version "0.6.5"
+            METADATA
+          end
+
+          let(:sample_index_data) do
+            {
+              "name" => "sample",
+              "versions" => [
+                "#{api_url}/cookbooks/sample/versions/0_6_5"
+              ]
+            }
+          end
+          let(:sample_0_6_5_data) do
+            {
+              "version" => "0.6.5",
+              "file" => "#{api_url}/cookbooks/sample/versions/0_6_5/file.tar"
+            }
+          end
+          let(:sample_0_6_5_package) do
+            s = StringIO.new
+            t = Archive::Tar::Minitar::Output.new(s)
+            t.tar.add_file_simple("sample/metadata.rb", :mode => 0700,
+              :size => sample_metadata.bytesize){|io| io.write(sample_metadata)}
+            t.close
+            s.string
+          end
+
+          before do
+            stub_request(:get, "#{api_url}/cookbooks/sample").
+              to_return(:body => JSON.dump(sample_index_data))
+
+            stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5").
+              to_return(:body => JSON.dump(sample_0_6_5_data))
+
+            stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5/file.tar").
+              to_return(:body => sample_0_6_5_package)
+          end
+
+          it "installs the manifest" do
+            env.install_path.mkpath
+            manifest = source.manifests("sample").first
+            source.install!(manifest)
+            text = env.install_path.join("sample/metadata.rb").read
+            text.should == sample_metadata
+          end
+
+        end
+
       end
     end
   end
