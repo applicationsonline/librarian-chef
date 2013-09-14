@@ -266,8 +266,8 @@ module Librarian
 
           def path_read_bytes_at(path, pos, len)
             path = Pathname(path)
+            path.stat.size >= pos + len or return
             path.open "rb" do |f|
-              f.size >= pos + len or return
               f.seek pos ; f.pos == pos or return
               f.read(len)
             end
