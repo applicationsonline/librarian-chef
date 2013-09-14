@@ -251,13 +251,9 @@ module Librarian
           end
 
           def path_detect_gzip?(path)
-            path = Pathname(path)
-            r = Zlib::GzipReader.new(path)
-            true
+            Zlib::GzipReader.open(path) { true }
           rescue Zlib::GzipFile::Error
             false
-          ensure
-            r.close if r && !r.closed?
           end
 
           def path_detect_tar?(path)
