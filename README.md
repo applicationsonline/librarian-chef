@@ -35,7 +35,7 @@ to manage them.
 
 ### The Cheffile
 
-Every infrastruture repository that uses Librarian-Chef will have a file named
+Every infrastructure repository that uses Librarian-Chef will have a file named
 `Cheffile` in the root directory of that repository. The full specification for
 which third-party, publicly-released cookbooks your infrastructure repository
 depends will go here.
