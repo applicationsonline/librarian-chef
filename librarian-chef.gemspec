@@ -20,7 +20,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency "librarian", "~> 0.1.0"
   gem.add_dependency "chef", ">= 0.10"
-  gem.add_dependency "archive-tar-minitar", ">= 0.5.2"
+  gem.add_dependency "minitar", ">= 0.5.2"
 
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rspec"

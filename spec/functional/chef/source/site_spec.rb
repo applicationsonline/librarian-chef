@@ -344,6 +344,65 @@ module Librarian
 
         end
 
+        describe "extracting .tar packages with long filenames" do
+          let(:source) { described_class.new(env, api_url) }
+
+          before { tmp_path.mkpath unless tmp_path.exist? }
+          let(:bad_name_size) { Librarian::Posix.run!(%W[getconf NAME_MAX #{tmp_path}]).to_i }
+          let(:bad_name_path) { SecureRandom.hex((bad_name_size.to_f/2).ceil)[0...bad_name_size] }
+
+          before { expect(bad_name_path.size).to eq bad_name_size }
+
+          let(:sample_metadata) do
+            Helpers.strip_heredoc(<<-METADATA)
+              version "0.6.5"
+            METADATA
+          end
+
+          let(:sample_index_data) do
+            {
+              "name" => "sample",
+              "versions" => [
+                "#{api_url}/cookbooks/sample/versions/0_6_5"
+              ]
+            }
+          end
+          let(:sample_0_6_5_data) do
+            {
+              "version" => "0.6.5",
+              "file" => "#{api_url}/cookbooks/sample/versions/0_6_5/file.tar"
+            }
+          end
+          let(:sample_0_6_5_package) do
+            tar_path = tmp_path + "tar-source"
+            tar_path.mkpath
+            tar_path.join("sample").mkpath
+            tar_path.join("sample/metadata.rb").open("w"){|io| io.write(sample_metadata)}
+            tar_path.join("sample/#{bad_name_path}").open("w"){|io| io.write(??)}
+            Librarian::Posix.run!(%W[tar cz -C #{tar_path} . ])
+          end
+
+          before do
+            stub_request(:get, "#{api_url}/cookbooks/sample").
+              to_return(:body => JSON.dump(sample_index_data))
+
+            stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5").
+              to_return(:body => JSON.dump(sample_0_6_5_data))
+
+            stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5/file.tar").
+              to_return(:body => sample_0_6_5_package)
+          end
+
+          it "installs the manifest" do
+            env.install_path.mkpath
+            manifest = source.manifests("sample").first
+            source.install!(manifest)
+            text = env.install_path.join("sample/#{bad_name_path}").read
+            text.should == ??
+          end
+
+        end
+
       end
     end
   end
