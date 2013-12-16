@@ -378,7 +378,7 @@ module Librarian
             tar_path.mkpath
             tar_path.join("sample").mkpath
             tar_path.join("sample/metadata.rb").open("w"){|io| io.write(sample_metadata)}
-            tar_path.join("sample/#{bad_name_path}").open("w"){|io| io.write(??)}
+            tar_path.join("sample/#{bad_name_path}").open("w"){|io| io.write("?")}
             Librarian::Posix.run!(%W[tar cz -C #{tar_path} . ])
           end
 
@@ -398,7 +398,7 @@ module Librarian
             manifest = source.manifests("sample").first
             source.install!(manifest)
             text = env.install_path.join("sample/#{bad_name_path}").read
-            text.should == ??
+            text.should == "?"
           end
 
         end
