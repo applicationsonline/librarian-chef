@@ -336,7 +336,9 @@ module Librarian
           end
 
           def http(uri)
-            environment.net_http_class(uri.host).new(uri.host, uri.port)
+            net_http = environment.net_http_class(uri.host).new(uri.host, uri.port)
+            net_http.use_ssl = true if uri.scheme == 'https'
+            net_http
           end
 
           def http_get(uri)
