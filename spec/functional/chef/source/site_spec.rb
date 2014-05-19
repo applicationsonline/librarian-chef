@@ -291,6 +291,61 @@ module Librarian
           end
         end
 
+        describe "https api endpoint" do
+          let(:https_api_url) { "https://site.cookbooks.com" }
+          let(:source) { described_class.new(env, https_api_url) }
+
+          let(:sample_metadata) do
+            Helpers.strip_heredoc(<<-METADATA)
+              version "0.6.5"
+            METADATA
+          end
+
+          let(:sample_index_data) do
+            {
+              "name" => "sample",
+              "versions" => [
+                "#{https_api_url}/cookbooks/sample/versions/0_6_5"
+              ]
+            }
+          end
+
+          let(:sample_0_6_5_data) do
+            {
+              "version" => "0.6.5",
+              "file" => "#{https_api_url}/cookbooks/sample/versions/0_6_5/file.tar.gz"
+            }
+          end
+
+          let(:sample_0_6_5_package) do
+            s = StringIO.new
+            z = Zlib::GzipWriter.new(s, Zlib::NO_COMPRESSION)
+            t = Archive::Tar::Minitar::Output.new(z)
+            t.tar.add_file_simple("sample/metadata.rb", :mode => 0700,
+              :size => sample_metadata.bytesize){|io| io.write(sample_metadata)}
+            t.close
+            z.close unless z.closed?
+            s.string
+          end
+
+          def stub_sample_cookbook_requests
+            stub_request(:get, "#{https_api_url}/cookbooks/sample").
+              to_return(:body => JSON.dump(sample_index_data))
+
+            stub_request(:get, "#{https_api_url}/cookbooks/sample/versions/0_6_5").
+              to_return(:body => JSON.dump(sample_0_6_5_data))
+
+            stub_request(:get, "#{https_api_url}/cookbooks/sample/versions/0_6_5/file.tar.gz").
+              to_return(:body => sample_0_6_5_package)
+          end
+
+          it 'handles https api endpoints' do
+            stub_sample_cookbook_requests
+            manifest = source.manifests("sample").first
+            manifest.version.to_s.should == "0.6.5"
+          end
+        end
+
         describe "extracting .tar packages" do
           let(:source) { described_class.new(env, api_url) }
 
