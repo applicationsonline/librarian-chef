@@ -362,8 +362,8 @@ module Librarian
               version "0.6.5"
             METADATA
           end
-          before do
 
+          before do
             # set up the git repo as normal, but let's also set up a release-stable branch
             # from which our Cheffile will only pull stable releases
             git_path.rmtree if git_path.exist?
