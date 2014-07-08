@@ -127,10 +127,18 @@ module Librarian
           end
 
           describe "#fetch_version" do
+
             it "fetches the version based on extra" do
               extra = "#{api_url}/cookbooks/sample/versions/0_6_5"
               source.fetch_version("sample", extra).should == "0.6.5"
             end
+
+            it "should not enable SSL by default" do
+              extra = "#{api_url}/cookbooks/sample/versions/0_6_5"
+              Net::HTTP.any_instance.should_receive(:use_ssl=).with(false).once
+              source.fetch_version("sample", extra)
+            end
+
           end
 
           describe "#fetch_dependencies" do
@@ -328,14 +336,16 @@ module Librarian
             s.string
           end
 
-          def stub_sample_cookbook_requests
-            stub_request(:get, "#{https_api_url}/cookbooks/sample").
+          def stub_sample_cookbook_requests(api_url = nil)
+            api_url ||= https_api_url
+
+            stub_request(:get, "#{api_url}/cookbooks/sample").
               to_return(:body => JSON.dump(sample_index_data))
 
-            stub_request(:get, "#{https_api_url}/cookbooks/sample/versions/0_6_5").
+            stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5").
               to_return(:body => JSON.dump(sample_0_6_5_data))
 
-            stub_request(:get, "#{https_api_url}/cookbooks/sample/versions/0_6_5/file.tar.gz").
+            stub_request(:get, "#{api_url}/cookbooks/sample/versions/0_6_5/file.tar.gz").
               to_return(:body => sample_0_6_5_package)
           end
 
@@ -344,6 +354,15 @@ module Librarian
             manifest = source.manifests("sample").first
             manifest.version.to_s.should == "0.6.5"
           end
+
+          it "should enable SSL" do
+            https_api_url = "http://site.cookbooks.com:443"
+
+            stub_sample_cookbook_requests(https_api_url)
+            Net::HTTP.any_instance.should_receive(:use_ssl=).with(true).twice
+            manifest = source.manifests("sample").first
+          end
+
         end
 
         describe "extracting .tar packages" do
