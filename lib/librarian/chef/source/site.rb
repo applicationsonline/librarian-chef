@@ -348,6 +348,8 @@ module Librarian
             loop do
               debug { "Performing http-get for #{uri}" }
               http = http(uri)
+              http.use_ssl = uri.scheme == 'https'
+              http.verify_mode = OpenSSL::SSL::VERIFY_NONE
               request = Net::HTTP::Get.new(uri.path)
               response = http.start{|http| http.request(request)}
 
