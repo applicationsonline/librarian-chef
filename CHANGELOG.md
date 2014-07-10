@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.0.4
+
+* Support HTTPS endpoints better. Thanks @onddo.
+
 ## 0.0.3
 
 * Support HTTPS endpoints. Thanks @sl4m.
