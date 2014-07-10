@@ -118,7 +118,7 @@ module Librarian
           describe "#manifests" do
             it "gives a list of all manifests" do
               manifests = source.manifests("sample")
-              expect(manifests.size).to eq(1)
+              manifests.should have(1).item
               manifest = manifests.first
               manifest.source.should be source
               manifest.version.should == Manifest::Version.new("0.6.5")

@@ -145,7 +145,7 @@ module Librarian
             end
           end
 
-          context "resolving and separately installing" do
+          context "resolving and and separately installing" do
             let(:repo_path) { tmp_path.join("repo/resolve-install") }
             before do
               repo_path.rmtree if repo_path.exist?
@@ -438,7 +438,7 @@ module Librarian
               metadata_file.should exist #sanity
               old_code_file.should exist #sanity
 
-              new_code_file.should_not exist # the assertion
+              new_code_file.should exist # the assertion
             end
           end
         end
