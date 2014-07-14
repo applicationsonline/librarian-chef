@@ -309,7 +309,8 @@ module Librarian
             subtemps.size > 1 and raise "The package archive has too many children!"
             subtemp = subtemps.first
             debug { "Moving #{relative_path_to(subtemp)} to #{relative_path_to(path)}" }
-            FileUtils.mv(subtemp, path)
+            FileUtils.cp_r(subtemp, path)
+            FileUtils.rm_rf(subtemp)
           ensure
             temp.rmtree if temp && temp.exist?
           end
