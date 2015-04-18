@@ -335,9 +335,17 @@ module Librarian
             environment.logger.relative_path_to(path)
           end
 
+          def windows_ssl_check_disable(net)
+            case RUBY_PLATFORM
+              when /win/i, /ming/i
+                net.verify_mode = OpenSSL::SSL::VERIFY_NONE if net.use_ssl?
+            end
+          end
+
           def http(uri)
             net_http = environment.net_http_class(uri.host).new(uri.host, uri.port)
             net_http.use_ssl = true if uri.scheme == 'https'
+            windows_ssl_check_disable(net_http)
             net_http
           end
 
