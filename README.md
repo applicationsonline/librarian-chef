@@ -58,7 +58,7 @@ Here's how it works:
 
 We start off by declaring the *default source* for this `Cheffile`.
 
-    site "https://supermarket.getchef.com/api/v1"
+    site "https://supermarket.chef.io/api/v1"
 
 This default source in this example is the Opscode Community Site API. This is
 most likely what you will want for your default source. However, you can
