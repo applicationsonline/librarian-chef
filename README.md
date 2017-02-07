@@ -42,23 +42,26 @@ depends will go here.
 
 Here's an example `Cheffile`:
 
-    site "https://supermarket.getchef.com/api/v1"
+```ruby
+site "https://supermarket.getchef.com/api/v1"
 
-    cookbook "ntp"
-    cookbook "timezone", "0.0.1"
+cookbook "ntp"
+cookbook "timezone", "0.0.1"
 
-    cookbook "rvm",
-      :git => "https://github.com/fnichol/chef-rvm",
-      :ref => "v0.7.1"
+cookbook "rvm",
+  :git => "https://github.com/fnichol/chef-rvm",
+  :ref => "v0.7.1"
 
-    cookbook "cloudera",
-      :path => "vendor/cookbooks/cloudera-cookbook"
+cookbook "cloudera",
+  :path => "vendor/cookbooks/cloudera-cookbook"
+```
 
 Here's how it works:
 
 We start off by declaring the *default source* for this `Cheffile`.
-
-    site "https://supermarket.getchef.com/api/v1"
+```ruby
+site "https://supermarket.getchef.com/api/v1"
+```
 
 This default source in this example is the Opscode Community Site API. This is
 most likely what you will want for your default source. However, you can
@@ -72,19 +75,25 @@ Any time we declare a cookbook dependency that has subsidiary cookbook
 dependencies of its own, Librarian-Chef assumes we want it to look for the
 subsidiary cookbook dependencies in the default source.
 
-    cookbook "ntp"
+```ruby
+cookbook "ntp"
+```
 
 Our infrastructure repository depends on the `ntp` cookbook from the default
 source. Any version of the `ntp` cookbook will fulfill our requirements.
 
-    cookbook "timezone", "0.0.1"
+```ruby
+cookbook "timezone", "0.0.1"
+```
 
 Our infrastructure repository depends on the `timezone` cookbook from the
 default source. But only version `0.0.1` of that cookbook will do.
 
-    cookbook "rvm",
-      :git => "https://github.com/fnichol/chef-rvm",
-      :ref => "v0.7.1"
+```ruby
+cookbook "rvm",
+  :git => "https://github.com/fnichol/chef-rvm",
+  :ref => "v0.7.1"
+```
 
 Our infrastructure repository depends on the `rvm` cookbook, but not the one
 from the default source. Instead, the cookbook is to be fetched from the
@@ -107,8 +116,10 @@ with many cookbooks in it. If we need a cookbook from such a repository, we can
 use the `:path =>` option here to help Librarian-Chef drill down and find the
 cookbook subdirectory.
 
-    cookbook "cloudera",
-      :path => "vendor/cookbooks/cloudera-cookbook"
+```ruby
+cookbook "cloudera",
+  :path => "vendor/cookbooks/cloudera-cookbook"
+```
 
 Our infrastructure repository depends on the `cloudera` cookbook, which we have
 downloaded and copied into our repository. In this example, `vendor/cookbooks/`
@@ -121,8 +132,10 @@ option.
 
 Also, there is shortcut for cookbooks hosted on GitHub, so we may write:
 
-    cookbook "rvm",
-      :github => "fnichol/chef-rvm"
+```ruby
+cookbook "rvm",
+  :github => "fnichol/chef-rvm"
+```
 
 ### How to Use
 
