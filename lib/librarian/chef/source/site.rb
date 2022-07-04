@@ -306,6 +306,7 @@ module Librarian
             subtemps = temp.children
             subtemps.empty? and raise "The package archive was empty!"
             subtemps.delete_if{|pth| pth.to_s[/pax_global_header/]}
+            subtemps.delete_if{|pth| pth.to_s[/PaxHeader/]}
             subtemps.size > 1 and raise "The package archive has too many children!"
             subtemp = subtemps.first
             debug { "Moving #{relative_path_to(subtemp)} to #{relative_path_to(path)}" }
